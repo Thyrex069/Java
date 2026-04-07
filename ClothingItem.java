@@ -4,4 +4,5 @@ public class ClothingItem {
     String color;
     double price;
     int stock; 
+
 }
