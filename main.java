@@ -41,13 +41,13 @@ public class Main {
         // --- Order ---
         Order o1 = new Order();
         o1.orderID      = "ORD-001";
-        o1.customer = c1;
+        o1.customerName = "Vimean";
         o1.totalPrice   = 12.99;
         o1.status       = "Paid";
 
         System.out.println("\n=== Order ===");
         System.out.println("Order ID : " + o1.orderID);
-        System.out.println("Customer : " + o1.customer.name);
+        System.out.println("Customer : " + o1.customerName);
         System.out.println("Total    : $" + o1.totalPrice);
         System.out.println("Status   : " + o1.status);
     }    
