@@ -3,19 +3,19 @@ package Model;
 import java.util.ArrayList;
 
 public class Receipt {
-    // Encapsulation (private attributes)
+    // Encapsulation 
     private String receiptId;
     private String customerName;
     private double totalAmount;
     private String paymentMethod;
 
-    // Week 3: static variable (class-level data)
+    // static variable 
     private static int receiptCount = 0;
 
-    // Week 3: collection (store multiple items)
+    //  collection (store multiple items)
     private ArrayList<OrderItem> items;
 
-    // Constructor (Week 2)
+    // Constructor 
     public Receipt(String receiptId, String customerName, String paymentMethod) {
         setReceiptId(receiptId);
         setCustomerName(customerName);
@@ -33,7 +33,7 @@ public class Receipt {
         }
     }
 
-    // Getter (Accessor methods)
+    // Getter 
     public String getReceiptId() {
         return receiptId;
     }
