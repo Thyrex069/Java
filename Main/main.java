@@ -8,7 +8,7 @@ import Model.Receipt;
 import Model.Staff;
 import java.util.ArrayList;
 
-public class main {
+public class Main {
 
     public static void main(String[] args) {
 
