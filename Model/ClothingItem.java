@@ -5,7 +5,7 @@ public class ClothingItem {
     // ── Fields ───────────────────────────────────────────────
     private String itemCode;
     private String itemName;
-    private String category; // fixed typo from "catogory"
+    private String category;
     private String size;
     private String color;
     private String gender;

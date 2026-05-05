@@ -7,8 +7,8 @@ public class Staff {
     private String name;
     private String role;
     private String shift;
-    private String phoneNumber; // fixed: was "PhoneNumber"
-    private String startDate; // fixed: was "StartDate"
+    private String phoneNumber;
+    private String startDate;
     private double salary;
 
     // ── Static counter ───────────────────────────────────────
