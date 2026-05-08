@@ -1,6 +1,9 @@
 package Model;
 
-public class OrderItem {
+import Interface.Displayable;
+
+// OrderItem implements Displayable → must provide display()
+public class OrderItem implements Displayable {
 
     // ── Fields ───────────────────────────────────────────────
     // Design B: stores a real ClothingItem object instead of just ID/name/price
@@ -73,5 +76,17 @@ public class OrderItem {
         } else {
             this.discount = discount;
         }
+    }
+
+    // ── Displayable interface method ──────────────────────────
+    @Override
+    public void display() {
+        System.out.println("  - " + getItemName()
+                + " | Size: "  + getSize()
+                + " | Color: " + getColor()
+                + " | Qty: "   + quantity
+                + " | Price: $"      + purchasePrice
+                + " | Discount: $"   + discount
+                + " | Subtotal: $"   + calculateSubtotal());
     }
 }

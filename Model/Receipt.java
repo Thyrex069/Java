@@ -1,6 +1,9 @@
 package Model;
 
-public class Receipt {
+import Interface.Displayable;
+
+// Receipt implements Displayable → must provide display()
+public class Receipt implements Displayable {
 
     // ── Fields ───────────────────────────────────────────────
     private String receiptId;
@@ -83,5 +86,25 @@ public class Receipt {
         } else {
             System.out.println("Payment method cannot be empty");
         }
+    }
+
+    // ── Displayable interface method ──────────────────────────
+    @Override
+    public void display() {
+        System.out.println("========================================");
+        System.out.println("              RECEIPT");
+        System.out.println("========================================");
+        System.out.println("  Receipt ID  : " + receiptId);
+        System.out.println("  Order ID    : " + getOrderID());
+        System.out.println("  Customer    : " + getCustomerName());
+        System.out.println("  Staff       : " + getStaffName());
+        System.out.println("  Payment     : " + paymentMethod);
+        System.out.println("  Items:");
+        for (OrderItem oi : order.getItems()) {
+            oi.display(); // each OrderItem displays itself
+        }
+        System.out.println("----------------------------------------");
+        System.out.printf( "  TOTAL       : $%.2f%n", finalAmount);
+        System.out.println("========================================");
     }
 }

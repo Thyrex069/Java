@@ -1,6 +1,11 @@
 package Model;
 
-public class Customer {
+import Interface.Displayable;
+import Interface.Manageable;
+
+// Customer implements Displayable → must provide display()
+// Customer implements Manageable  → must provide getId() and getSummary()
+public class Customer implements Displayable, Manageable {
 
     // ── Fields ───────────────────────────────────────────────
     private String customerId;
@@ -80,5 +85,29 @@ public class Customer {
         } else {
             this.loyaltyPoints += points;
         }
+    }
+
+    // ── Manageable interface methods ─────────────────────────
+    @Override
+    public String getId() {
+        return customerId;
+    }
+
+    @Override
+    public String getSummary() {
+        return "Customer [" + customerId + "] " + name
+                + " | Membership: " + membershipLevel
+                + " | Points: " + loyaltyPoints;
+    }
+
+    // ── Displayable interface method ──────────────────────────
+    @Override
+    public void display() {
+        System.out.println("--- Customer ---");
+        System.out.println("  ID          : " + customerId);
+        System.out.println("  Name        : " + name);
+        System.out.println("  Phone       : " + phone);
+        System.out.println("  Membership  : " + membershipLevel);
+        System.out.println("  Points      : " + loyaltyPoints);
     }
 }

@@ -1,6 +1,11 @@
 package Model;
 
-public class Staff {
+import Interface.Displayable;
+import Interface.Manageable;
+
+// Staff implements Displayable → must provide display()
+// Staff implements Manageable  → must provide getId() and getSummary()
+public class Staff implements Displayable, Manageable {
 
     // ── Fields ───────────────────────────────────────────────
     private String staffId;
@@ -100,5 +105,31 @@ public class Staff {
         } else {
             this.salary = salary;
         }
+    }
+
+    // ── Manageable interface methods ─────────────────────────
+    @Override
+    public String getId() {
+        return staffId;
+    }
+
+    @Override
+    public String getSummary() {
+        return "Staff [" + staffId + "] " + name
+                + " | Role: " + role
+                + " | Shift: " + shift;
+    }
+
+    // ── Displayable interface method ──────────────────────────
+    @Override
+    public void display() {
+        System.out.println("--- Staff ---");
+        System.out.println("  ID          : " + staffId);
+        System.out.println("  Name        : " + name);
+        System.out.println("  Role        : " + role);
+        System.out.println("  Shift       : " + shift);
+        System.out.println("  Phone       : " + phoneNumber);
+        System.out.println("  Start Date  : " + startDate);
+        System.out.printf( "  Salary      : $%.2f%n", salary);
     }
 }

@@ -1,6 +1,11 @@
 package Model;
 
-public class ClothingItem {
+import Interface.Displayable;
+import Interface.Manageable;
+
+// ClothingItem implements Displayable → must provide display()
+// ClothingItem implements Manageable  → must provide getId() and getSummary()
+public class ClothingItem implements Displayable, Manageable {
 
     // ── Fields ───────────────────────────────────────────────
     private String itemCode;
@@ -130,5 +135,34 @@ public class ClothingItem {
         } else {
             this.stock -= quantity;
         }
+    }
+
+    // ── Manageable interface methods ─────────────────────────
+    @Override
+    public String getId() {
+        return itemCode;
+    }
+
+    @Override
+    public String getSummary() {
+        return "ClothingItem [" + itemCode + "] " + itemName
+                + " | Category: " + category
+                + " | Size: " + size
+                + " | Price: $" + price
+                + " | Stock: " + stock;
+    }
+
+    // ── Displayable interface method ──────────────────────────
+    @Override
+    public void display() {
+        System.out.println("--- Clothing Item ---");
+        System.out.println("  Code        : " + itemCode);
+        System.out.println("  Name        : " + itemName);
+        System.out.println("  Category    : " + category);
+        System.out.println("  Size        : " + size);
+        System.out.println("  Color       : " + color);
+        System.out.println("  Gender      : " + gender);
+        System.out.printf( "  Price       : $%.2f%n", price);
+        System.out.println("  Stock       : " + stock);
     }
 }

@@ -1,8 +1,10 @@
 package Model;
 
+import Interface.Displayable;
 import java.util.ArrayList;
 
-public class Order {
+// Order implements Displayable → must provide display()
+public class Order implements Displayable {
 
     // ── Fields ───────────────────────────────────────────────
     private String orderID;
@@ -133,5 +135,22 @@ public class Order {
     public void setPaymentStatus(String paymentStatus) {
         validateString(paymentStatus, "Payment Status");
         this.paymentStatus = paymentStatus;
+    }
+
+    // ── Displayable interface method ──────────────────────────
+    @Override
+    public void display() {
+        System.out.println("--- Order ---");
+        System.out.println("  Order ID    : " + orderID);
+        System.out.println("  Customer    : " + customer.getName());
+        System.out.println("  Staff       : " + staff.getName());
+        System.out.println("  Date        : " + orderDate);
+        System.out.println("  Status      : " + status);
+        System.out.println("  Payment     : " + paymentStatus);
+        System.out.println("  Items:");
+        for (OrderItem oi : items) {
+            oi.display(); // each OrderItem knows how to display itself
+        }
+        System.out.printf("  Total       : $%.2f%n", calculateTotal());
     }
 }
