@@ -1,156 +1,179 @@
 package Model;
 
 import Interface.Displayable;
+import Interface.Calculatable;
 import java.util.ArrayList;
 
-// Order implements Displayable → must provide display()
-public class Order implements Displayable {
+public class Order implements Displayable, Calculatable {
 
     // ── Fields ───────────────────────────────────────────────
-    private String orderID;
-    private String orderDate;
-    private Customer customer; // Association: Order knows its Customer
-    private Staff staff; // Association: Order knows which Staff processed it
-    private ArrayList<OrderItem> items; // Composition: Order is made of OrderItems
-    private String status;
-    private String paymentStatus;
+    private String              orderId;
+    private Customer            customer;
+    private Staff               staff;          // assigned only after confirmOrder()
+    private ArrayList<OrderItem> orderItems;
+    private String              orderDate;
+    private String              orderStatus;    // "Pending" → "Confirmed" | "Cancelled"
+    private String              paymentStatus;  // "Unpaid"  → "Paid"      | "Failed"
 
     // ── Static counter ───────────────────────────────────────
     private static int orderCount = 0;
 
     // ── Constructor ──────────────────────────────────────────
-    // Order now requires both Customer and Staff — shows full association
-    public Order(String orderID, Customer customer, Staff staff, String orderDate) {
-        setOrderID(orderID);
-        setCustomer(customer);
-        setStaff(staff);
-        setOrderDate(orderDate);
-        this.items = new ArrayList<>();
+    // Staff is NOT passed here — assigned when confirmOrder(staff) is called
+    public Order(String orderId, Customer customer, String orderDate) {
+        this.orderId       = cleanText(orderId,    "NO_ORDER_ID");
+        this.customer      = customer;
+        this.staff         = null;
+        this.orderDate     = cleanText(orderDate,  "No Date");
+        this.orderItems    = new ArrayList<>();
+        this.orderStatus   = "Pending";
+        this.paymentStatus = "Unpaid";
         orderCount++;
     }
 
     // ── Validation helper ────────────────────────────────────
-    private void validateString(String value, String fieldName) {
-        if (value == null || value.trim().isEmpty()) {
-            System.out.println("Error: " + fieldName + " cannot be null or empty");
-        }
+    private String cleanText(String value, String defaultValue) {
+        if (value == null || value.trim().isEmpty()) return defaultValue;
+        return value.trim();
     }
 
     // ── Static method ────────────────────────────────────────
-    public static int getOrderCount() {
-        return orderCount;
+    public static int getOrderCount() { return orderCount; }
+
+    // ── Getters ──────────────────────────────────────────────
+    public String              getOrderId()       { return orderId; }
+    public Customer            getCustomer()      { return customer; }
+    public Staff               getStaff()         { return staff; }
+    public String              getOrderDate()     { return orderDate; }
+    public String              getOrderStatus()   { return orderStatus; }
+    public String              getPaymentStatus() { return paymentStatus; }
+
+    public ArrayList<OrderItem> getOrderItemsCopy() {
+        return new ArrayList<>(orderItems); // defensive copy
     }
 
-    // ── Add item to order ────────────────────────────────────
-    public void addItem(OrderItem item) {
-        if (item != null) {
-            items.add(item);
-        } else {
-            System.out.println("Cannot add null item to order");
+    // ── Status checks ────────────────────────────────────────
+    public boolean hasItems()    { return !orderItems.isEmpty(); }
+    public boolean isConfirmed() { return "Confirmed".equalsIgnoreCase(orderStatus); }
+    public boolean isPaid()      { return "Paid".equalsIgnoreCase(paymentStatus); }
+
+    // ── Add order item (only while Pending) ──────────────────
+    public boolean addOrderItem(OrderItem orderItem) {
+        if (!"Pending".equalsIgnoreCase(orderStatus)) {
+            System.out.println("Cannot add items. Order is already " + orderStatus + ".");
+            return false;
         }
+        if (orderItem == null || orderItem.getItem() == null) {
+            System.out.println("Cannot add invalid order item.");
+            return false;
+        }
+        orderItems.add(orderItem);
+        return true;
     }
 
-    // ── Calculate total ──────────────────────────────────────
-    // Always loops through items for accurate total
-    // This is safer than storing totalPrice because discounts may change
-    public double calculateTotal() {
+    // ── Stock check — ALL items must have enough before ANY stock is reduced ──
+    private boolean checkAllStockAvailable() {
+        if (orderItems.isEmpty()) {
+            System.out.println("Order cannot be confirmed without items.");
+            return false;
+        }
+        for (OrderItem oi : orderItems) {
+            if (!oi.hasEnoughStock()) {
+                System.out.println("Order cannot be confirmed: insufficient stock.");
+                oi.displayInfo();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean reduceAllStock() {
+        for (OrderItem oi : orderItems) {
+            if (!oi.reduceItemStock()) {
+                System.out.println("Stock reduction failed.");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // ── Confirm order (called by Staff.processOrder) ─────────
+    public boolean confirmOrder(Staff staff) {
+        if (!"Pending".equalsIgnoreCase(orderStatus)) {
+            System.out.println("Order " + orderId + " is already " + orderStatus + ".");
+            return false;
+        }
+        if (customer == null) {
+            System.out.println("Order cannot be confirmed without a customer.");
+            return false;
+        }
+        if (staff == null) {
+            System.out.println("Order cannot be confirmed without staff.");
+            return false;
+        }
+        if (!checkAllStockAvailable()) return false;
+        if (!reduceAllStock())         return false;
+
+        this.staff       = staff;
+        this.orderStatus = "Confirmed";
+        return true;
+    }
+
+    // ── Mark as paid (order must be confirmed first) ─────────
+    public boolean markAsPaid() {
+        if (!isConfirmed()) {
+            System.out.println("Payment failed. Order must be confirmed first.");
+            paymentStatus = "Failed";
+            return false;
+        }
+        if (calculate() <= 0) {
+            System.out.println("Payment failed. Order total must be greater than 0.");
+            paymentStatus = "Failed";
+            return false;
+        }
+        paymentStatus = "Paid";
+        return true;
+    }
+
+    // ── Cancel order ─────────────────────────────────────────
+    public void cancelOrder() {
+        if (isPaid()) {
+            System.out.println("Paid order cannot be cancelled.");
+            return;
+        }
+        orderStatus = "Cancelled";
+    }
+
+    // ── Calculatable interface ────────────────────────────────
+    // Sums calculate() from every OrderItem
+    @Override
+    public double calculate() {
         double total = 0;
-        for (OrderItem item : items) {
-            total += item.calculateSubtotal();
+        for (OrderItem oi : orderItems) {
+            total += oi.calculate();
         }
         return total;
     }
 
-    // ── Confirm order and reduce stock ───────────────────────
-    // Stock should only be reduced AFTER order is confirmed
-    public void confirmOrder() {
-        this.status = "Confirmed";
-        for (OrderItem oi : items) {
-            oi.getItem().reduceStock(oi.getQuantity());
-        }
-        System.out.println("Order " + orderID + " confirmed. Stock updated.");
-    }
-
-    // ── Getters ──────────────────────────────────────────────
-    public String getOrderID() {
-        return orderID;
-    }
-
-    public String getOrderDate() {
-        return orderDate;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public Staff getStaff() {
-        return staff;
-    }
-
-    public ArrayList<OrderItem> getItems() {
-        return items;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    // ── Setters ──────────────────────────────────────────────
-    private void setOrderID(String orderID) {
-        validateString(orderID, "Order ID");
-        this.orderID = orderID;
-    }
-
-    private void setOrderDate(String orderDate) {
-        validateString(orderDate, "Order Date");
-        this.orderDate = orderDate;
-    }
-
-    private void setCustomer(Customer customer) {
-        if (customer == null) {
-            System.out.println("Error: Customer cannot be null");
-        } else {
-            this.customer = customer;
-        }
-    }
-
-    private void setStaff(Staff staff) {
-        if (staff == null) {
-            System.out.println("Error: Staff cannot be null");
-        } else {
-            this.staff = staff;
-        }
-    }
-
-    public void setStatus(String status) {
-        validateString(status, "Status");
-        this.status = status;
-    }
-
-    public void setPaymentStatus(String paymentStatus) {
-        validateString(paymentStatus, "Payment Status");
-        this.paymentStatus = paymentStatus;
-    }
-
-    // ── Displayable interface method ──────────────────────────
+    // ── Displayable ──────────────────────────────────────────
     @Override
-    public void display() {
-        System.out.println("--- Order ---");
-        System.out.println("  Order ID    : " + orderID);
-        System.out.println("  Customer    : " + customer.getName());
-        System.out.println("  Staff       : " + staff.getName());
-        System.out.println("  Date        : " + orderDate);
-        System.out.println("  Status      : " + status);
-        System.out.println("  Payment     : " + paymentStatus);
-        System.out.println("  Items:");
-        for (OrderItem oi : items) {
-            oi.display(); // each OrderItem knows how to display itself
+    public void displayInfo() {
+        System.out.println("\n========== Order Detail ==========");
+        System.out.println("Order ID       : " + orderId);
+        System.out.println("Date           : " + orderDate);
+        System.out.println("Order Status   : " + orderStatus);
+        System.out.println("Payment Status : " + paymentStatus);
+        System.out.println("Customer       : " + (customer != null ? customer.getName() : "None"));
+        System.out.println("Processed By   : " + (staff    != null ? staff.getName()    : "Not assigned yet"));
+        System.out.println("Items:");
+        if (orderItems.isEmpty()) {
+            System.out.println("  No items in this order.");
+        } else {
+            for (OrderItem oi : orderItems) {
+                oi.displayInfo();
+            }
         }
-        System.out.printf("  Total       : $%.2f%n", calculateTotal());
+        System.out.println("Total          : $" + calculate());
+        System.out.println("==================================");
     }
 }

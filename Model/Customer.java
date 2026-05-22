@@ -1,113 +1,84 @@
 package Model;
 
-import Interface.Displayable;
-import Interface.Manageable;
+import java.util.ArrayList;
 
-// Customer implements Displayable → must provide display()
-// Customer implements Manageable  → must provide getId() and getSummary()
-public class Customer implements Displayable, Manageable {
+// Customer IS-A Person → correct inheritance
+public class Customer extends Person {
 
     // ── Fields ───────────────────────────────────────────────
-    private String customerId;
-    private String name;
-    private String phone;
     private String membershipLevel;
     private int loyaltyPoints;
+    private ArrayList<Order> orders; // one Customer can have many Orders
 
     // ── Static counter ───────────────────────────────────────
     private static int customerCount = 0;
 
     // ── Constructor ──────────────────────────────────────────
-    public Customer(String customerId, String name) {
-        setCustomerId(customerId);
-        setName(name);
-        setMembershipLevel("Bronze");
+    public Customer(String customerId, String name, String phone, String membershipLevel) {
+        super(customerId, name, phone); // id, name, phone handled by Person
+        setMembershipLevel(membershipLevel);
+        this.loyaltyPoints = 0;
+        this.orders = new ArrayList<>();
         customerCount++;
     }
 
-    // ── Validation helper ────────────────────────────────────
-    private void validateString(String value, String fieldName) {
-        if (value == null || value.trim().isEmpty()) {
-            System.out.println(fieldName + " cannot be null or empty");
-        }
-    }
-
     // ── Static method ────────────────────────────────────────
-    public static int getCustomerCount() {
-        return customerCount;
-    }
+    public static int getCustomerCount() { return customerCount; }
 
     // ── Getters ──────────────────────────────────────────────
-    public String getCustomerId() {
-        return customerId;
+    public String getCustomerId()      { return id; } // inherited from Person
+    public String getMembershipLevel() { return membershipLevel; }
+    public int    getLoyaltyPoints()   { return loyaltyPoints; }
+
+    public ArrayList<Order> getOrdersCopy() {
+        return new ArrayList<>(orders); // defensive copy — no external modification
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getMembershipLevel() {
-        return membershipLevel;
-    }
-
-    public int getLoyaltyPoints() {
-        return loyaltyPoints;
-    }
+    public int getOrderHistorySize() { return orders.size(); }
 
     // ── Setters ──────────────────────────────────────────────
-    private void setCustomerId(String customerId) {
-        validateString(customerId, "Customer ID");
-        this.customerId = customerId;
-    }
-
-    public void setName(String name) {
-        validateString(name, "Name");
-        this.name = name;
-    }
-
-    public void setPhone(String phone) {
-        validateString(phone, "Phone");
-        this.phone = phone;
-    }
-
-    private void setMembershipLevel(String membershipLevel) {
-        validateString(membershipLevel, "Membership Level");
-        this.membershipLevel = membershipLevel;
-    }
-
-    public void addLoyaltyPoints(int points) {
-        if (points < 0) {
-            System.out.println("Points cannot be negative");
+    public void setMembershipLevel(String membershipLevel) {
+        if (membershipLevel == null || membershipLevel.trim().isEmpty()) {
+            this.membershipLevel = "Regular";
         } else {
-            this.loyaltyPoints += points;
+            this.membershipLevel = membershipLevel.trim();
         }
     }
 
-    // ── Manageable interface methods ─────────────────────────
-    @Override
-    public String getId() {
-        return customerId;
+    // ── Business methods ─────────────────────────────────────
+    public void addLoyaltyPoints(int points) {
+        if (points > 0) {
+            loyaltyPoints += points;
+        }
     }
 
-    @Override
-    public String getSummary() {
-        return "Customer [" + customerId + "] " + name
-                + " | Membership: " + membershipLevel
-                + " | Points: " + loyaltyPoints;
+    // Called by ClothingShopSystem after order is placed successfully
+    public void addOrder(Order order) {
+        if (order != null && !orders.contains(order)) {
+            orders.add(order);
+        }
     }
 
-    // ── Displayable interface method ──────────────────────────
+    public void displayOrderHistory() {
+        System.out.println("\nOrder History for " + name + ":");
+        if (orders.isEmpty()) {
+            System.out.println("  No orders yet.");
+            return;
+        }
+        for (Order order : orders) {
+            order.displayInfo();
+        }
+    }
+
+    // ── Displayable ──────────────────────────────────────────
     @Override
-    public void display() {
+    public void displayInfo() {
         System.out.println("--- Customer ---");
-        System.out.println("  ID          : " + customerId);
-        System.out.println("  Name        : " + name);
-        System.out.println("  Phone       : " + phone);
-        System.out.println("  Membership  : " + membershipLevel);
-        System.out.println("  Points      : " + loyaltyPoints);
+        System.out.println("  Customer ID      : " + id);
+        System.out.println("  Name             : " + name);
+        System.out.println("  Phone            : " + phone);
+        System.out.println("  Membership Level : " + membershipLevel);
+        System.out.println("  Loyalty Points   : " + loyaltyPoints);
+        System.out.println("  Total Orders     : " + orders.size());
     }
 }

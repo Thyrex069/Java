@@ -1,92 +1,89 @@
 package Model;
 
 import Interface.Displayable;
+import Interface.Calculatable;
 
-// OrderItem implements Displayable → must provide display()
-public class OrderItem implements Displayable {
+public class OrderItem implements Displayable, Calculatable {
 
     // ── Fields ───────────────────────────────────────────────
-    // Design B: stores a real ClothingItem object instead of just ID/name/price
-    private ClothingItem item;
-    private int quantity;
-    private double discount;
-
-    // purchasePrice locks in the price at the time of purchase.
-    // This is important because ClothingItem.price may change later,
-    // but the customer was charged the price at time of purchase.
-    private double purchasePrice;
+    private int          orderItemId;
+    private ClothingItem item;          // real object — not just a name/ID string
+    private int          quantity;
+    private double       discountPercent;
+    private double       purchasePrice;  // locked at purchase time — survives price changes
 
     // ── Static counter ───────────────────────────────────────
     private static int orderItemCount = 0;
 
     // ── Constructor ──────────────────────────────────────────
-    public OrderItem(ClothingItem item, int quantity) {
-        setItem(item);
+    public OrderItem(int orderItemId, ClothingItem item, int quantity) {
+        setOrderItemId(orderItemId);
+        this.item = item;
         setQuantity(quantity);
-        this.discount = 0.0;
-        // Lock in price at time of purchase
-        this.purchasePrice = item.getPrice();
+        this.discountPercent = 0;
+        this.purchasePrice   = (item != null) ? item.getPrice() : 0;
         orderItemCount++;
     }
 
     // ── Static method ────────────────────────────────────────
-    public static int getOrderItemCount() {
-        return orderItemCount;
-    }
-
-    // ── Calculate subtotal ───────────────────────────────────
-    // Uses purchasePrice (locked at purchase time), not current item price
-    public double calculateSubtotal() {
-        double subtotal = purchasePrice * quantity;
-        return subtotal - discount;
-    }
+    public static int getOrderItemCount() { return orderItemCount; }
 
     // ── Getters ──────────────────────────────────────────────
-    public ClothingItem getItem()      { return item; }
-    public int          getQuantity()  { return quantity; }
-    public double       getDiscount()  { return discount; }
-    public double       getPurchasePrice() { return purchasePrice; }
-
-    // Convenience getters — access ClothingItem info directly from OrderItem
-    public String getItemName() { return item.getItemName(); }
-    public String getItemCode() { return item.getItemCode(); }
-    public String getSize()     { return item.getSize(); }
-    public String getColor()    { return item.getColor(); }
+    public int          getOrderItemId()    { return orderItemId; }
+    public ClothingItem getItem()           { return item; }
+    public int          getQuantity()       { return quantity; }
+    public double       getDiscountPercent(){ return discountPercent; }
+    public double       getPurchasePrice()  { return purchasePrice; }
 
     // ── Setters ──────────────────────────────────────────────
-    public void setItem(ClothingItem item) {
-        if (item == null) {
-            System.out.println("ClothingItem cannot be null");
-        } else {
-            this.item = item;
-        }
+    private void setOrderItemId(int orderItemId) {
+        this.orderItemId = (orderItemId > 0) ? orderItemId : 0;
     }
 
     public void setQuantity(int quantity) {
-        if (quantity <= 0) {
-            System.out.println("Quantity must be greater than zero");
-        } else {
-            this.quantity = quantity;
-        }
+        this.quantity = (quantity > 0) ? quantity : 1;
     }
 
-    public void setDiscount(double discount) {
-        if (discount < 0) {
-            System.out.println("Discount cannot be negative");
-        } else {
-            this.discount = discount;
-        }
+    public void setDiscountPercent(double discountPercent) {
+        this.discountPercent = (discountPercent >= 0 && discountPercent <= 100)
+                ? discountPercent : 0;
     }
 
-    // ── Displayable interface method ──────────────────────────
+    // ── Stock helpers (delegates to ClothingItem's StockManageable methods) ──
+    public boolean hasEnoughStock() {
+        if (item == null) return false;
+        return item.hasEnoughStock(quantity);
+    }
+
+    public boolean reduceItemStock() {
+        if (item == null) return false;
+        return item.reduceStock(quantity);
+    }
+
+    // ── Calculatable interface ────────────────────────────────
+    // Formula: purchasePrice × quantity, then subtract discount amount
     @Override
-    public void display() {
-        System.out.println("  - " + getItemName()
-                + " | Size: "  + getSize()
-                + " | Color: " + getColor()
-                + " | Qty: "   + quantity
-                + " | Price: $"      + purchasePrice
-                + " | Discount: $"   + discount
-                + " | Subtotal: $"   + calculateSubtotal());
+    public double calculate() {
+        double subtotalBeforeDiscount = purchasePrice * quantity;
+        double discountAmount = subtotalBeforeDiscount * discountPercent / 100;
+        return subtotalBeforeDiscount - discountAmount;
+    }
+
+    // ── Displayable ──────────────────────────────────────────
+    @Override
+    public void displayInfo() {
+        if (item == null) {
+            System.out.println("  Invalid order item: no clothing item selected.");
+            return;
+        }
+        System.out.println(
+            "  " + item.getItemName() +
+            " | Size: "           + item.getSize() +
+            " | Color: "          + item.getColor() +
+            " | Qty: "            + quantity +
+            " | Purchase Price: $"+ purchasePrice +
+            " | Discount: "       + discountPercent + "%" +
+            " | Subtotal: $"      + calculate()
+        );
     }
 }

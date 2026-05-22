@@ -1,150 +1,115 @@
 package Main;
 
 import Model.ClothingItem;
+import Model.ClothingShopSystem;
 import Model.Customer;
 import Model.Order;
 import Model.OrderItem;
 import Model.Receipt;
 import Model.Staff;
-import java.util.ArrayList;
 
-public class main {
+public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("========================================");
-        System.out.println("   CLOTHING SHOP MANAGEMENT SYSTEM     ");
-        System.out.println("========================================\n");
+        // ── Create the system ─────────────────────────────────────────────────
+        ClothingShopSystem system = new ClothingShopSystem("CAM Clothing Shop");
 
-        // ════════════════════════════════════════════════════
-        // STEP 1: CREATE TWO CUSTOMERS
-        // ════════════════════════════════════════════════════
-        System.out.println("--- Customers ---");
+        // ── Step 1: Create customers ──────────────────────────────────────────
+        Customer customer1 = new Customer("C001", "Emma Davis",  "012345678", "Gold");
+        Customer customer2 = new Customer("C002", "Dara Sok",    "098765432", "Regular");
 
-        Customer customer1 = new Customer("C001", "Emma Davis");
-        customer1.setPhone("016-1112222");
-        customer1.addLoyaltyPoints(100);
+        system.addCustomer(customer1);
+        system.addCustomer(customer2);
 
-        Customer customer2 = new Customer("C002", "James Lee");
-        customer2.setPhone("017-3334444");
+        // ── Step 2: Create staff ──────────────────────────────────────────────
+        Staff staff1 = new Staff("S001", "Sokha", "011111111",
+                                 "Cashier", "Morning", "2026-05-18", 450);
+        system.addStaff(staff1);
 
-        ArrayList<Customer> customerList = new ArrayList<>();
-        customerList.add(customer1);
-        customerList.add(customer2);
+        // ── Step 3: Create clothing items ─────────────────────────────────────
+        ClothingItem tee    = new ClothingItem("IT001", "Classic White Tee", "M",  "White", "Unisex",  "T-Shirt", 29.90, 50);
+        ClothingItem dress  = new ClothingItem("IT002", "Summer Dress",      "S",  "Blue",  "Women",   "Dress",   49.90, 20);
+        ClothingItem jacket = new ClothingItem("IT003", "Denim Jacket",      "L",  "Blue",  "Unisex",  "Jacket",  79.90, 10);
 
-        // display() from Displayable interface — each Customer prints itself
-        for (Customer c : customerList) {
-            c.display();
+        system.addClothingItem(tee);
+        system.addClothingItem(dress);
+        system.addClothingItem(jacket);
+
+        System.out.println("Before order:");
+        system.displayInventory();
+        system.displayCategories();
+
+        // ── Validate wrong item selection ─────────────────────────────────────
+        ClothingItem wrongSelection = system.searchClothingItemById("IT999");
+        if (wrongSelection == null) {
+            System.out.println("\nInvalid item selection: item IT999 does not exist.");
         }
-        // getSummary() from Manageable interface — one-line summary
-        System.out.println("\nCustomer Summaries:");
-        for (Customer c : customerList) {
-            System.out.println("  " + c.getSummary());
+
+        // ── Step 4: Build order ───────────────────────────────────────────────
+        Order order1 = new Order("ORD001", customer1, "2026-05-18");
+
+        ClothingItem selectedItem1 = system.searchClothingItemById("IT001");
+        ClothingItem selectedItem2 = system.searchClothingItemById("IT002");
+
+        OrderItem orderItem1 = new OrderItem(1, selectedItem1, 2);
+        OrderItem orderItem2 = new OrderItem(2, selectedItem2, 1);
+
+        orderItem1.setDiscountPercent(10); // 10% discount on tee
+
+        order1.addOrderItem(orderItem1);
+        order1.addOrderItem(orderItem2);
+
+        System.out.println("\nOrder total before confirmation: $" + order1.calculate());
+
+        // ── Step 5: Place order (staff confirms, stock reduced here) ──────────
+        system.placeOrder(order1, staff1);
+
+        // ── Step 6: Process payment ───────────────────────────────────────────
+        system.processPayment("ORD001");
+
+        // ── Step 7: Create receipt ────────────────────────────────────────────
+        Receipt receipt1 = system.createReceipt("REC001", order1, "Credit Card", "2026-05-18");
+
+        // ── Display results ───────────────────────────────────────────────────
+        System.out.println("\nAfter order:");
+        order1.displayInfo();
+
+        if (receipt1 != null) {
+            receipt1.printReceipt();
         }
-        System.out.println("Total Customers Created: " + Customer.getCustomerCount());
 
-        // ════════════════════════════════════════════════════
-        // STEP 2: CREATE ONE STAFF MEMBER
-        // ════════════════════════════════════════════════════
-        System.out.println("\n--- Staff ---");
-
-        Staff staff1 = new Staff("S001", "Bob Smith", "2024-03-01");
-        staff1.setRole("Cashier");
-        staff1.setShift("Morning");
-        staff1.setPhoneNumber("011-9876543");
-        staff1.setSalary(2000.00);
-
-        // display() from Displayable interface
-        staff1.display();
-        System.out.println("Summary: " + staff1.getSummary()); // Manageable
-        System.out.println("Total Staff Created: " + Staff.getStaffCount());
-
-        // ════════════════════════════════════════════════════
-        // STEP 3: CREATE THREE CLOTHING ITEMS
-        // ════════════════════════════════════════════════════
-        System.out.println("\n--- Clothing Inventory ---");
-
-        ClothingItem item1 = new ClothingItem("CI001", "Classic White Tee", "Tops", "M", "White", "Unisex");
-        item1.setPrice(29.90);
-        item1.setStock(50);
-
-        ClothingItem item2 = new ClothingItem("CI002", "Slim Fit Jeans", "Bottoms", "L", "Blue", "Male");
-        item2.setPrice(89.90);
-        item2.setStock(30);
-
-        ClothingItem item3 = new ClothingItem("CI003", "Floral Summer Dress", "Dress", "S", "Pink", "Female");
-        item3.setPrice(59.90);
-        item3.setStock(20);
-
-        ArrayList<ClothingItem> inventory = new ArrayList<>();
-        inventory.add(item1);
-        inventory.add(item2);
-        inventory.add(item3);
-
-        // display() from Displayable interface — each item prints itself
-        for (ClothingItem item : inventory) {
-            item.display();
+        // ── Search demo ───────────────────────────────────────────────────────
+        Order foundOrder = system.searchOrderById("ORD001");
+        if (foundOrder != null) {
+            System.out.println("\nSearch result for Order ORD001:");
+            foundOrder.displayInfo();
         }
-        System.out.println("Total Clothing Items Created: " + ClothingItem.getItemCount());
 
-        // ════════════════════════════════════════════════════
-        // STEP 4: CREATE ONE ORDER FOR CUSTOMER 1
-        // ════════════════════════════════════════════════════
-        System.out.println("\n--- Processing Order ---");
+        // ── Customer order history ────────────────────────────────────────────
+        customer1.displayOrderHistory();
 
-        Order order1 = new Order("ORD001", customer1, staff1, "2025-04-27");
-        order1.setPaymentStatus("Paid");
+        // ── Staff info ────────────────────────────────────────────────────────
+        staff1.displayInfo();
 
-        // Add OrderItems to the order
-        OrderItem orderItem1 = new OrderItem(item1, 2); // 2x Classic White Tee
-        OrderItem orderItem2 = new OrderItem(item3, 1); // 1x Floral Summer Dress
+        // ── Inventory after order ─────────────────────────────────────────────
+        system.displayInventory();
 
-        order1.addItem(orderItem1);
-        order1.addItem(orderItem2);
+        // ── System summary ────────────────────────────────────────────────────
+        system.displayInfo();
 
-        // Apply $5.00 discount to the dress
-        orderItem2.setDiscount(5.00);
-        System.out.println("Discount of $5.00 applied to: " + orderItem2.getItemName());
-
-        // display() from Displayable interface — Order prints itself + all items
-        order1.display();
-
-        // ════════════════════════════════════════════════════
-        // STEP 5: CONFIRM ORDER — REDUCES STOCK
-        // ════════════════════════════════════════════════════
-        System.out.println("\n--- Confirming Order ---");
-        System.out.println("Stock BEFORE confirmation:");
-        System.out.println("  " + item1.getItemName() + " stock: " + item1.getStock());
-        System.out.println("  " + item3.getItemName() + " stock: " + item3.getStock());
-
-        order1.confirmOrder();
-
-        System.out.println("Stock AFTER confirmation:");
-        System.out.println("  " + item1.getItemName() + " stock: " + item1.getStock());
-        System.out.println("  " + item3.getItemName() + " stock: " + item3.getStock());
-
-        // ════════════════════════════════════════════════════
-        // STEP 6: CREATE RECEIPT FROM THE COMPLETED ORDER
-        // ════════════════════════════════════════════════════
-        Receipt receipt1 = new Receipt("REC001", order1, "Credit Card");
-
-        // display() from Displayable interface — Receipt prints itself like a real receipt
-        receipt1.display();
-
-        // ════════════════════════════════════════════════════
-        // STEP 7: STATIC COUNTERS SUMMARY
-        // ════════════════════════════════════════════════════
-        System.out.println("\n--- System Summary (Static Counters) ---");
-        System.out.println("Total Customers Created    : " + Customer.getCustomerCount());
-        System.out.println("Total Staff Created        : " + Staff.getStaffCount());
-        System.out.println("Total Clothing Items Created: " + ClothingItem.getItemCount());
-        System.out.println("Total Orders Created       : " + Order.getOrderCount());
-        System.out.println("Total Order Items Created  : " + OrderItem.getOrderItemCount());
-        System.out.println("Total Receipts Issued      : " + Receipt.getReceiptCount());
-
-        System.out.println("\n========================================");
-        System.out.println("           PROGRAM COMPLETE             ");
-        System.out.println("========================================");
-
+        // ── Static counters vs collection sizes ──────────────────────────────
+        System.out.println("\nStatic counters vs collection size:");
+        System.out.println("Customer.getCustomerCount()          : " + Customer.getCustomerCount());
+        System.out.println("system.getCustomerListSize()         : " + system.getCustomerListSize());
+        System.out.println("Staff.getStaffCount()                : " + Staff.getStaffCount());
+        System.out.println("system.getStaffListSize()            : " + system.getStaffListSize());
+        System.out.println("ClothingItem.getClothingItemCount()  : " + ClothingItem.getClothingItemCount());
+        System.out.println("system.getInventorySize()            : " + system.getInventorySize());
+        System.out.println("OrderItem.getOrderItemCount()        : " + OrderItem.getOrderItemCount());
+        System.out.println("Order.getOrderCount()                : " + Order.getOrderCount());
+        System.out.println("system.getOrderListSize()            : " + system.getOrderListSize());
+        System.out.println("Receipt.getReceiptCount()            : " + Receipt.getReceiptCount());
+        System.out.println("system.getReceiptListSize()          : " + system.getReceiptListSize());
     }
 }

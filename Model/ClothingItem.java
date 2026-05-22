@@ -1,168 +1,112 @@
 package Model;
 
 import Interface.Displayable;
-import Interface.Manageable;
+import Interface.StockManageable;
 
-// ClothingItem implements Displayable → must provide display()
-// ClothingItem implements Manageable  → must provide getId() and getSummary()
-public class ClothingItem implements Displayable, Manageable {
+public class ClothingItem implements Displayable, StockManageable {
 
     // ── Fields ───────────────────────────────────────────────
-    private String itemCode;
+    private String itemId;
     private String itemName;
-    private String category;
     private String size;
     private String color;
     private String gender;
+    private String category;
     private double price;
-    private int stock;
+    private int    stock;
 
     // ── Static counter ───────────────────────────────────────
-    // Counts how many ClothingItem objects have been created
-    private static int itemCount = 0;
+    private static int clothingItemCount = 0;
 
     // ── Constructor ──────────────────────────────────────────
-    public ClothingItem(String itemCode, String itemName, String category,
-            String size, String color, String gender) {
-        setItemCode(itemCode);
-        setItemName(itemName);
-        setCategory(category);
-        setSize(size);
-        setColor(color);
-        setGender(gender);
-        itemCount++; // increment every time a new ClothingItem is created
+    public ClothingItem(String itemId, String itemName, String size,
+                        String color, String gender, String category,
+                        double price, int stock) {
+        this.itemId    = cleanText(itemId,    "NO_ITEM_ID");
+        this.itemName  = cleanText(itemName,  "Unknown Item");
+        this.size      = cleanText(size,      "Free Size");
+        this.color     = cleanText(color,     "Unknown Color");
+        this.gender    = cleanText(gender,    "Unisex");
+        this.category  = cleanText(category,  "General");
+        setPrice(price);
+        setStock(stock);
+        clothingItemCount++;
     }
 
     // ── Validation helper ────────────────────────────────────
-    private void validateString(String value, String fieldName) {
-        if (value == null || value.trim().isEmpty()) {
-            System.out.println(fieldName + " cannot be null or empty");
-        }
+    private String cleanText(String value, String defaultValue) {
+        if (value == null || value.trim().isEmpty()) return defaultValue;
+        return value.trim();
     }
 
     // ── Static method ────────────────────────────────────────
-    public static int getItemCount() {
-        return itemCount;
-    }
+    public static int getClothingItemCount() { return clothingItemCount; }
 
     // ── Getters ──────────────────────────────────────────────
-    public String getItemCode() {
-        return itemCode;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public int getStock() {
-        return stock;
-    }
+    public String getItemId()   { return itemId; }
+    public String getItemName() { return itemName; }
+    public String getSize()     { return size; }
+    public String getColor()    { return color; }
+    public String getGender()   { return gender; }
+    public String getCategory() { return category; }
+    public double getPrice()    { return price; }
+    public int    getStock()    { return stock; }
 
     // ── Setters ──────────────────────────────────────────────
-    private void setItemCode(String itemCode) {
-        validateString(itemCode, "Item Code");
-        this.itemCode = itemCode;
-    }
-
     public void setItemName(String itemName) {
-        validateString(itemName, "Item Name");
-        this.itemName = itemName;
+        if (itemName != null && !itemName.trim().isEmpty()) this.itemName = itemName.trim();
     }
-
-    public void setCategory(String category) {
-        validateString(category, "Category");
-        this.category = category;
-    }
-
     public void setSize(String size) {
-        validateString(size, "Size");
-        this.size = size;
+        if (size != null && !size.trim().isEmpty()) this.size = size.trim();
     }
-
     public void setColor(String color) {
-        validateString(color, "Color");
-        this.color = color;
+        if (color != null && !color.trim().isEmpty()) this.color = color.trim();
     }
-
     public void setGender(String gender) {
-        validateString(gender, "Gender");
-        this.gender = gender;
+        if (gender != null && !gender.trim().isEmpty()) this.gender = gender.trim();
     }
-
+    public void setCategory(String category) {
+        if (category != null && !category.trim().isEmpty()) this.category = category.trim();
+    }
     public void setPrice(double price) {
-        if (price < 0) {
-            System.out.println("Price cannot be negative");
-        } else {
-            this.price = price;
-        }
+        this.price = (price >= 0) ? price : 0;
     }
-
     public void setStock(int stock) {
-        if (stock < 0) {
-            System.out.println("Stock cannot be negative");
-        } else {
-            this.stock = stock;
+        this.stock = (stock >= 0) ? stock : 0;
+    }
+
+    // ── StockManageable interface ─────────────────────────────
+    @Override
+    public boolean hasEnoughStock(int quantity) {
+        return quantity > 0 && stock >= quantity;
+    }
+
+    @Override
+    public boolean reduceStock(int quantity) {
+        if (!hasEnoughStock(quantity)) {
+            System.out.println("Not enough stock for " + itemName + ".");
+            return false;
         }
+        stock -= quantity;
+        return true;
     }
 
-    // ── Reduce stock method ──────────────────────────────────
-    // Called after order is confirmed — reduces stock by quantity purchased
-    public void reduceStock(int quantity) {
-        if (quantity <= 0) {
-            System.out.println("Quantity must be greater than zero");
-        } else if (quantity > stock) {
-            System.out.println("Not enough stock for: " + itemName);
-        } else {
-            this.stock -= quantity;
-        }
+    public void increaseStock(int quantity) {
+        if (quantity > 0) stock += quantity;
     }
 
-    // ── Manageable interface methods ─────────────────────────
+    // ── Displayable ──────────────────────────────────────────
     @Override
-    public String getId() {
-        return itemCode;
-    }
-
-    @Override
-    public String getSummary() {
-        return "ClothingItem [" + itemCode + "] " + itemName
-                + " | Category: " + category
-                + " | Size: " + size
-                + " | Price: $" + price
-                + " | Stock: " + stock;
-    }
-
-    // ── Displayable interface method ──────────────────────────
-    @Override
-    public void display() {
-        System.out.println("--- Clothing Item ---");
-        System.out.println("  Code        : " + itemCode);
-        System.out.println("  Name        : " + itemName);
-        System.out.println("  Category    : " + category);
-        System.out.println("  Size        : " + size);
-        System.out.println("  Color       : " + color);
-        System.out.println("  Gender      : " + gender);
-        System.out.printf( "  Price       : $%.2f%n", price);
-        System.out.println("  Stock       : " + stock);
+    public void displayInfo() {
+        System.out.println(
+            "  Item ID: " + itemId +
+            " | Name: "     + itemName +
+            " | Size: "     + size +
+            " | Color: "    + color +
+            " | Gender: "   + gender +
+            " | Category: " + category +
+            " | Price: $"   + price +
+            " | Stock: "    + stock
+        );
     }
 }
