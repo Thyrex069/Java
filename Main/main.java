@@ -143,5 +143,27 @@ public class Main {
         System.out.printf("  %-38s : %d%n", "system.getOrderListSize()", system.getOrderListSize());
         System.out.printf("  %-38s : %d%n", "Receipt.getReceiptCount()", Receipt.getReceiptCount());
         System.out.printf("  %-38s : %d%n", "system.getReceiptListSize()", system.getReceiptListSize());
+
+        // ── Step 12: Test order cancellation and stock restoration ───────────
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 12] TESTING ORDER CANCELLATION & STOCK RESTORATION                  ");
+        System.out.println("====================================================================================================");
+        Customer tempCustomer = new Customer("C999", "Test Customer", "000", "Regular");
+        system.addCustomer(tempCustomer);
+
+        Order order2 = new Order("ORD002", tempCustomer, "2026-05-18");
+        ClothingItem denimJacket = system.searchClothingItemById("IT003");
+        OrderItem tempOi = new OrderItem(3, denimJacket, 2);
+        order2.addOrderItem(tempOi);
+
+        System.out.println("  Initial stock of Denim Jacket (IT003)      : " + denimJacket.getStock());
+        
+        System.out.println("  Confirming order...");
+        system.placeOrder(order2, staff1);
+        System.out.println("  Stock after order confirmation (IT003)     : " + denimJacket.getStock());
+
+        System.out.println("  Cancelling order...");
+        order2.cancelOrder();
+        System.out.println("  Stock after order cancellation (IT003)     : " + denimJacket.getStock());
     }
 }

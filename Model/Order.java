@@ -141,6 +141,22 @@ public class Order implements Displayable, Calculatable {
             System.out.println("Paid order cannot be cancelled.");
             return;
         }
+        if ("Cancelled".equalsIgnoreCase(orderStatus)) {
+            System.out.println("Order " + orderId + " is already cancelled.");
+            return;
+        }
+        
+        // If the order was confirmed, we must restore the inventory stock
+        if (isConfirmed()) {
+            for (OrderItem oi : orderItems) {
+                if (oi.getItem() != null) {
+                    oi.getItem().increaseStock(oi.getQuantity());
+                }
+            }
+            System.out.println("Order " + orderId + " cancelled. Stock has been restored.");
+        } else {
+            System.out.println("Order " + orderId + " has been cancelled.");
+        }
         orderStatus = "Cancelled";
     }
 
