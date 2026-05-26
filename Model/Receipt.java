@@ -60,25 +60,29 @@ public class Receipt implements Displayable, Printable {
             System.out.println("Cannot print invalid receipt.");
             return;
         }
-        System.out.println("\n========== Receipt ==========");
-        System.out.println("Receipt ID     : " + receiptId);
-        System.out.println("Receipt Date   : " + receiptDate);
-        System.out.println("Order ID       : " + order.getOrderId());
-        System.out.println("Payment Method : " + paymentMethod);
+        System.out.println("====================================================================================================");
+        System.out.println("                                           SALES RECEIPT                                            ");
+        System.out.println("====================================================================================================");
+        System.out.printf( "  Receipt ID     : %s%n", receiptId);
+        System.out.printf( "  Receipt Date   : %s%n", receiptDate);
+        System.out.printf( "  Order ID       : %s%n", order.getOrderId());
+        System.out.printf( "  Payment Method : %s%n", paymentMethod);
         if (order.getCustomer() != null) {
-            System.out.println("Customer       : " + order.getCustomer().getName());
+            System.out.printf( "  Customer       : %s%n", order.getCustomer().getName());
         }
         if (order.getStaff() != null) {
-            System.out.println("Processed By   : " + order.getStaff().getName());
+            System.out.printf( "  Processed By   : %s%n", order.getStaff().getName());
         }
-        System.out.println("Items:");
+        System.out.println("----------------------------------------------------------------------------------------------------");
+        System.out.println("  Items Purchased:");
         ArrayList<OrderItem> items = order.getOrderItemsCopy();
         for (OrderItem item : items) {
             item.displayInfo();
         }
-        System.out.println("Final Amount   : $" + finalAmount);
-        System.out.println("Receipt Count  : " + receiptCount);
-        System.out.println("=============================");
+        System.out.println("----------------------------------------------------------------------------------------------------");
+        System.out.printf( "  Final Amount   : $%.2f%n", finalAmount);
+        System.out.printf( "  Receipt Count  : %d%n", receiptCount);
+        System.out.println("====================================================================================================");
     }
 
     // ── Displayable ──────────────────────────────────────────

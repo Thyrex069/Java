@@ -36,17 +36,25 @@ public class Main {
         system.addClothingItem(dress);
         system.addClothingItem(jacket);
 
-        System.out.println("Before order:");
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 1] INITIAL STORE INVENTORY & CATEGORIES                              ");
+        System.out.println("====================================================================================================");
         system.displayInventory();
         system.displayCategories();
 
         // ── Validate wrong item selection ─────────────────────────────────────
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 2] TESTING INVALID CLOTHING ITEM SEARCH                              ");
+        System.out.println("====================================================================================================");
         ClothingItem wrongSelection = system.searchClothingItemById("IT999");
         if (wrongSelection == null) {
-            System.out.println("\nInvalid item selection: item IT999 does not exist.");
+            System.out.println("  Search Result: Clothing item with ID 'IT999' was not found (Correct behavior).");
         }
 
         // ── Step 4: Build order ───────────────────────────────────────────────
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 3] BUILDING AND INITIATING AN ORDER                                  ");
+        System.out.println("====================================================================================================");
         Order order1 = new Order("ORD001", customer1, "2026-05-18");
 
         ClothingItem selectedItem1 = system.searchClothingItemById("IT001");
@@ -60,56 +68,80 @@ public class Main {
         order1.addOrderItem(orderItem1);
         order1.addOrderItem(orderItem2);
 
-        System.out.println("\nOrder total before confirmation: $" + order1.calculate());
+        System.out.printf("  Order subtotal calculated before confirmation: $%.2f%n", order1.calculate());
 
         // ── Step 5: Place order (staff confirms, stock reduced here) ──────────
+        System.out.println("\n  Placing order through system...");
         system.placeOrder(order1, staff1);
 
         // ── Step 6: Process payment ───────────────────────────────────────────
+        System.out.println("  Processing order payment...");
         system.processPayment("ORD001");
 
         // ── Step 7: Create receipt ────────────────────────────────────────────
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 4] RECEIPT GENERATION & CUSTOMER CHECKOUT                            ");
+        System.out.println("====================================================================================================");
         Receipt receipt1 = system.createReceipt("REC001", order1, "Credit Card", "2026-05-18");
-
-        // ── Display results ───────────────────────────────────────────────────
-        System.out.println("\nAfter order:");
-        order1.displayInfo();
 
         if (receipt1 != null) {
             receipt1.printReceipt();
         }
 
+        // ── Display results ───────────────────────────────────────────────────
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 5] DETAILED CONFIRMED ORDER VIEW                                     ");
+        System.out.println("====================================================================================================");
+        order1.displayInfo();
+
         // ── Search demo ───────────────────────────────────────────────────────
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 6] SEARCHING FOR ORDER IN SYSTEM BY ID                               ");
+        System.out.println("====================================================================================================");
         Order foundOrder = system.searchOrderById("ORD001");
         if (foundOrder != null) {
-            System.out.println("\nSearch result for Order ORD001:");
+            System.out.println("  Order found successfully:");
             foundOrder.displayInfo();
         }
 
         // ── Customer order history ────────────────────────────────────────────
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 7] CUSTOMER ACCOUNT & PURCHASE HISTORY                               ");
+        System.out.println("====================================================================================================");
         customer1.displayOrderHistory();
 
         // ── Staff info ────────────────────────────────────────────────────────
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 8] STAFF INFORMATION & EMPLOYMENT SUMMARY                            ");
+        System.out.println("====================================================================================================");
         staff1.displayInfo();
 
         // ── Inventory after order ─────────────────────────────────────────────
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 9] INVENTORY STATE AFTER ORDER FULFILLMENT                           ");
+        System.out.println("====================================================================================================");
         system.displayInventory();
 
         // ── System summary ────────────────────────────────────────────────────
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 10] SYSTEM STATUS SUMMARY                                            ");
+        System.out.println("====================================================================================================");
         system.displayInfo();
 
         // ── Static counters vs collection sizes ──────────────────────────────
-        System.out.println("\nStatic counters vs collection size:");
-        System.out.println("Customer.getCustomerCount()          : " + Customer.getCustomerCount());
-        System.out.println("system.getCustomerListSize()         : " + system.getCustomerListSize());
-        System.out.println("Staff.getStaffCount()                : " + Staff.getStaffCount());
-        System.out.println("system.getStaffListSize()            : " + system.getStaffListSize());
-        System.out.println("ClothingItem.getClothingItemCount()  : " + ClothingItem.getClothingItemCount());
-        System.out.println("system.getInventorySize()            : " + system.getInventorySize());
-        System.out.println("OrderItem.getOrderItemCount()        : " + OrderItem.getOrderItemCount());
-        System.out.println("Order.getOrderCount()                : " + Order.getOrderCount());
-        System.out.println("system.getOrderListSize()            : " + system.getOrderListSize());
-        System.out.println("Receipt.getReceiptCount()            : " + Receipt.getReceiptCount());
-        System.out.println("system.getReceiptListSize()          : " + system.getReceiptListSize());
+        System.out.println("\n====================================================================================================");
+        System.out.println("                         [STEP 11] SYSTEM METRICS & STATIC CONTEXT VALIDATION                       ");
+        System.out.println("====================================================================================================");
+        System.out.printf("  %-38s : %d%n", "Customer.getCustomerCount()", Customer.getCustomerCount());
+        System.out.printf("  %-38s : %d%n", "system.getCustomerListSize()", system.getCustomerListSize());
+        System.out.printf("  %-38s : %d%n", "Staff.getStaffCount()", Staff.getStaffCount());
+        System.out.printf("  %-38s : %d%n", "system.getStaffListSize()", system.getStaffListSize());
+        System.out.printf("  %-38s : %d%n", "ClothingItem.getClothingItemCount()", ClothingItem.getClothingItemCount());
+        System.out.printf("  %-38s : %d%n", "system.getInventorySize()", system.getInventorySize());
+        System.out.printf("  %-38s : %d%n", "OrderItem.getOrderItemCount()", OrderItem.getOrderItemCount());
+        System.out.printf("  %-38s : %d%n", "Order.getOrderCount()", Order.getOrderCount());
+        System.out.printf("  %-38s : %d%n", "system.getOrderListSize()", system.getOrderListSize());
+        System.out.printf("  %-38s : %d%n", "Receipt.getReceiptCount()", Receipt.getReceiptCount());
+        System.out.printf("  %-38s : %d%n", "system.getReceiptListSize()", system.getReceiptListSize());
     }
 }

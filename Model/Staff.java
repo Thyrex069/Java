@@ -63,13 +63,16 @@ public class Staff extends Person {
     // ── Displayable ──────────────────────────────────────────
     @Override
     public void displayInfo() {
-        System.out.println("--- Staff ---");
-        System.out.println("  Staff ID   : " + id);
-        System.out.println("  Name       : " + name);
-        System.out.println("  Phone      : " + phone);
-        System.out.println("  Role       : " + role);
-        System.out.println("  Shift      : " + shift);
-        System.out.println("  Start Date : " + startDate);
-        System.out.printf( "  Salary     : $%.2f%n", salary);
+        System.out.println("+--------------------------------------------------------+");
+        System.out.println("|                      STAFF INFO                        |");
+        System.out.println("+--------------------------------------------------------+");
+        System.out.printf( "| Staff ID   : %-42s |%n", id);
+        System.out.printf( "| Name       : %-42s |%n", name);
+        System.out.printf( "| Phone      : %-42s |%n", phone);
+        System.out.printf( "| Role       : %-42s |%n", role);
+        System.out.printf( "| Shift      : %-42s |%n", shift);
+        System.out.printf( "| Start Date : %-42s |%n", startDate);
+        System.out.printf( "| Salary     : $%-41.2f |%n", salary);
+        System.out.println("+--------------------------------------------------------+");
     }
 }

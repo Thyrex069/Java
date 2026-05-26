@@ -160,7 +160,9 @@ public class ClothingShopSystem implements Displayable, ClothingSearchable, Orde
 
     // ── Display helpers ──────────────────────────────────────
     public void displayInventory() {
-        System.out.println("\n========== Inventory ==========");
+        System.out.println("====================================================================================================");
+        System.out.println("                                            STORE INVENTORY                                         ");
+        System.out.println("====================================================================================================");
         if (inventory.isEmpty()) {
             System.out.println("  No clothing items available.");
         } else {
@@ -168,22 +170,22 @@ public class ClothingShopSystem implements Displayable, ClothingSearchable, Orde
                 item.displayInfo();
             }
         }
-        System.out.println("===============================");
+        System.out.println("====================================================================================================");
     }
 
     public void displayCategories() {
-        System.out.println("\nClothing Categories:");
+        System.out.println("Clothing Categories:");
         if (categories.isEmpty()) {
             System.out.println("  No categories yet.");
         } else {
             for (String category : categories) {
-                System.out.println("  - " + category);
+                System.out.println("  • " + category);
             }
         }
     }
 
     public void displayAllOrders() {
-        System.out.println("\nOrder History in " + systemName + ":");
+        System.out.println("Order History in " + systemName + ":");
         if (orders.isEmpty()) {
             System.out.println("  No orders yet.");
         } else {
@@ -211,14 +213,16 @@ public class ClothingShopSystem implements Displayable, ClothingSearchable, Orde
     // ── Displayable ──────────────────────────────────────────
     @Override
     public void displayInfo() {
-        System.out.println("\n========== Clothing Shop System Summary ==========");
-        System.out.println("System Name   : " + systemName);
-        System.out.println("Customers     : " + customers.size());
-        System.out.println("Staff Members : " + staffMembers.size());
-        System.out.println("Inventory     : " + inventory.size());
-        System.out.println("Orders        : " + orders.size());
-        System.out.println("Receipts      : " + receipts.size());
-        System.out.println("Categories    : " + categories.size());
-        System.out.println("==================================================");
+        System.out.println("+--------------------------------------------------------+");
+        System.out.println("|               CLOTHING SHOP SYSTEM SUMMARY             |");
+        System.out.println("+--------------------------------------------------------+");
+        System.out.printf( "| System Name   : %-38s |%n", systemName);
+        System.out.printf( "| Customers     : %-38d |%n", customers.size());
+        System.out.printf( "| Staff Members : %-38d |%n", staffMembers.size());
+        System.out.printf( "| Inventory Size: %-38d |%n", inventory.size());
+        System.out.printf( "| Orders Placed : %-38d |%n", orders.size());
+        System.out.printf( "| Receipts Gen  : %-38d |%n", receipts.size());
+        System.out.printf( "| Categories    : %-38d |%n", categories.size());
+        System.out.println("+--------------------------------------------------------+");
     }
 }

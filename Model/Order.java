@@ -158,22 +158,26 @@ public class Order implements Displayable, Calculatable {
     // ── Displayable ──────────────────────────────────────────
     @Override
     public void displayInfo() {
-        System.out.println("\n========== Order Detail ==========");
-        System.out.println("Order ID       : " + orderId);
-        System.out.println("Date           : " + orderDate);
-        System.out.println("Order Status   : " + orderStatus);
-        System.out.println("Payment Status : " + paymentStatus);
-        System.out.println("Customer       : " + (customer != null ? customer.getName() : "None"));
-        System.out.println("Processed By   : " + (staff    != null ? staff.getName()    : "Not assigned yet"));
-        System.out.println("Items:");
+        System.out.println("====================================================================================================");
+        System.out.println("                                            ORDER DETAIL                                            ");
+        System.out.println("====================================================================================================");
+        System.out.printf( "  Order ID       : %s%n", orderId);
+        System.out.printf( "  Date           : %s%n", orderDate);
+        System.out.printf( "  Order Status   : %s%n", orderStatus);
+        System.out.printf( "  Payment Status : %s%n", paymentStatus);
+        System.out.printf( "  Customer       : %s%n", (customer != null ? customer.getName() : "None"));
+        System.out.printf( "  Processed By   : %s%n", (staff    != null ? staff.getName()    : "Not assigned yet"));
+        System.out.println("----------------------------------------------------------------------------------------------------");
+        System.out.println("  Items Purchased:");
         if (orderItems.isEmpty()) {
-            System.out.println("  No items in this order.");
+            System.out.println("    No items in this order.");
         } else {
             for (OrderItem oi : orderItems) {
                 oi.displayInfo();
             }
         }
-        System.out.println("Total          : $" + calculate());
-        System.out.println("==================================");
+        System.out.println("----------------------------------------------------------------------------------------------------");
+        System.out.printf( "  Total Amount   : $%.2f%n", calculate());
+        System.out.println("====================================================================================================");
     }
 }

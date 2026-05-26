@@ -73,17 +73,12 @@ public class OrderItem implements Displayable, Calculatable {
     @Override
     public void displayInfo() {
         if (item == null) {
-            System.out.println("  Invalid order item: no clothing item selected.");
+            System.out.println("    [Invalid Item]");
             return;
         }
-        System.out.println(
-            "  " + item.getItemName() +
-            " | Size: "           + item.getSize() +
-            " | Color: "          + item.getColor() +
-            " | Qty: "            + quantity +
-            " | Purchase Price: $"+ purchasePrice +
-            " | Discount: "       + discountPercent + "%" +
-            " | Subtotal: $"      + calculate()
+        System.out.printf(
+            "    - %-22s | Size: %-3s | Color: %-7s | Qty: %-2d | Price: $%-6.2f | Disc: %5.1f%% | Subtotal: $%.2f%n",
+            item.getItemName(), item.getSize(), item.getColor(), quantity, purchasePrice, discountPercent, calculate()
         );
     }
 }

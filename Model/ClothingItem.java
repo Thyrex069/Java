@@ -98,15 +98,9 @@ public class ClothingItem implements Displayable, StockManageable {
     // ── Displayable ──────────────────────────────────────────
     @Override
     public void displayInfo() {
-        System.out.println(
-            "  Item ID: " + itemId +
-            " | Name: "     + itemName +
-            " | Size: "     + size +
-            " | Color: "    + color +
-            " | Gender: "   + gender +
-            " | Category: " + category +
-            " | Price: $"   + price +
-            " | Stock: "    + stock
+        System.out.printf(
+            "  ID: %-6s | %-20s | Size: %-3s | Color: %-7s | %-7s | Category: %-9s | Price: $%-6.2f | Stock: %d%n",
+            itemId, itemName, size, color, gender, category, price, stock
         );
     }
 }

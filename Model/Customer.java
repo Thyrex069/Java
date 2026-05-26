@@ -73,12 +73,15 @@ public class Customer extends Person {
     // ── Displayable ──────────────────────────────────────────
     @Override
     public void displayInfo() {
-        System.out.println("--- Customer ---");
-        System.out.println("  Customer ID      : " + id);
-        System.out.println("  Name             : " + name);
-        System.out.println("  Phone            : " + phone);
-        System.out.println("  Membership Level : " + membershipLevel);
-        System.out.println("  Loyalty Points   : " + loyaltyPoints);
-        System.out.println("  Total Orders     : " + orders.size());
+        System.out.println("+--------------------------------------------------------+");
+        System.out.println("|                     CUSTOMER INFO                      |");
+        System.out.println("+--------------------------------------------------------+");
+        System.out.printf( "| Customer ID      : %-35s |%n", id);
+        System.out.printf( "| Name             : %-35s |%n", name);
+        System.out.printf( "| Phone            : %-35s |%n", phone);
+        System.out.printf( "| Membership Level : %-35s |%n", membershipLevel);
+        System.out.printf( "| Loyalty Points   : %-35d |%n", loyaltyPoints);
+        System.out.printf( "| Total Orders     : %-35d |%n", orders.size());
+        System.out.println("+--------------------------------------------------------+");
     }
 }
